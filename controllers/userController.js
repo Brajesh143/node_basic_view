@@ -53,4 +53,28 @@ const getLogin = (req, res, next) => {
     })
 }
 
-module.exports = { getSignup, postSignup, getLogin }
+const postLogin = asyncHandler(async(req, res, next) => {
+    const { email, password } = req.body
+
+    try {
+        const userCheck = await User.findOne({ email: email })
+        if (!userCheck) {
+            res.redirect('/signup')
+        }
+
+        const checkPassword = await bcrypt.compare(password, userCheck.password)
+        if (!checkPassword) {
+            res.redirect('/login')
+        }
+
+        req.session.isLoggedIn = true;
+        req.session.user = userCheck;
+        req.session.save()
+        res.redirect('/login');
+
+    } catch (err) {
+        console.log(err)
+    }
+})
+
+module.exports = { getSignup, postSignup, getLogin, postLogin }
