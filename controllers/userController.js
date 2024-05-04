@@ -23,7 +23,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
         const checkUser = await User.findOne({ email: email })
 
         if (checkUser) {
-            res.redirect('/signup')
+            throw new Error("Email already exist")
         }
         
         const hashedPassword = await bcrypt.hash(password, 12)
@@ -41,7 +41,9 @@ const postSignup = asyncHandler(async(req, res, next) => {
         }
 
     } catch (err) {
-        console.log(err)
+        const error = new Error(err)
+        // error.statusCode = 500
+        return next(error)
     }
 })
 
@@ -59,12 +61,12 @@ const postLogin = asyncHandler(async(req, res, next) => {
     try {
         const userCheck = await User.findOne({ email: email })
         if (!userCheck) {
-            res.redirect('/signup')
+            throw new Error("User not found")
         }
 
         const checkPassword = await bcrypt.compare(password, userCheck.password)
         if (!checkPassword) {
-            res.redirect('/login')
+            throw new Error("Credential not match")
         }
 
         req.session.isLoggedIn = true;
@@ -73,8 +75,44 @@ const postLogin = asyncHandler(async(req, res, next) => {
         res.redirect('/login');
 
     } catch (err) {
-        console.log(err)
+        const error = new Error(err)
+        // error.statusCode = 400
+        return next(error)
     }
 })
 
-module.exports = { getSignup, postSignup, getLogin, postLogin }
+const getProfile = asyncHandler(async(req, res, next) => {
+    let message = req.flash('error');
+    
+    res.render('profile', {
+        errorMessage: message
+    })
+})
+
+const postProfile = asyncHandler(async(req, res, next) => {
+    const { name, email, password, phone } = req.body
+    const image = req.file;
+    const userData = req.session.user
+
+    try {
+        const imageUrl = image.path;
+        
+        const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl,}})
+
+        res.redirect('/profile')
+
+    } catch (err) {
+        const error = new Error(err)
+        // error.statusCode = 400
+        return next(error)
+    }
+})
+
+const postLogout = (req, res, next) => {
+    req.session.destroy(err => {
+      console.log(err);
+      res.redirect('/login');
+    });
+};
+
+module.exports = { getSignup, postSignup, getLogin, postLogin, getProfile, postProfile, postLogout }
