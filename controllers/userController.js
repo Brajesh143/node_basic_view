@@ -76,7 +76,8 @@ const postLogin = asyncHandler(async(req, res, next) => {
         req.session.isLoggedIn = true;
         req.session.user = userCheck;
         req.session.save()
-        res.redirect('/login');
+        req.flash('User logged in successfuly!')
+        return res.redirect('/profile');
 
     } catch (err) {
         const error = new Error(err)
@@ -86,10 +87,15 @@ const postLogin = asyncHandler(async(req, res, next) => {
 })
 
 const getProfile = asyncHandler(async(req, res, next) => {
-    let message = req.flash('error');
+    let message = req.flash('success');
+    if (message.length > 0) {
+        message = message[0];
+    } else {
+        message = null;
+    }
     
     res.render('profile', {
-        errorMessage: message
+        message: message
     })
 })
 

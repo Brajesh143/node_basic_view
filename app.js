@@ -70,10 +70,11 @@ app.use(flash());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.session.isLoggedIn;
     res.locals.csrfToken = req.csrfToken();
+    res.locals.message = req.flash();
     next();
 });
 
-app.use('/', userRouter)
+app.use('/', userRouter) 
 app.use(errorController.get404);
 app.use(errorHandler)
 

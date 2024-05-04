@@ -1,11 +1,17 @@
 <%- include('includes/head.ejs') -%>
 <link rel="stylesheet" href="/css/form.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" >
 
 <body>
     <%- include('includes/navigation.ejs') %>
 
     <main>
         <div class="form-align">
+            <% if(message){ %>
+            <div class="alert alert-success" role="alert">
+                <%= message %>
+            </div>
+            <% } %>
             <h1>User Profile</h1>
             <form class="main-form" action="/profile" method="post" enctype="multipart/form-data">
                 <div class="form-control">
