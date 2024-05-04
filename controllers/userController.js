@@ -3,6 +3,10 @@ const bcrypt = require("bcryptjs")
 
 const User = require("../models/user")
 
+const getMainPage = (req, res, next) => {
+    res.render('main')
+}
+
 const getSignup = (req, res, next) => {
     let message = req.flash('error');
     if (message.length > 0) {
@@ -115,4 +119,4 @@ const postLogout = (req, res, next) => {
     });
 };
 
-module.exports = { getSignup, postSignup, getLogin, postLogin, getProfile, postProfile, postLogout }
+module.exports = { getSignup, postSignup, getLogin, postLogin, getProfile, postProfile, postLogout, getMainPage }

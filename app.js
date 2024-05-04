@@ -10,6 +10,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'images/' })
 
 const userRouter = require("./routes/user")
+const errorController = require('./controllers/error')
 const errorHandler = require("./middlewares/errorHandler")
 
 const dbUurl = 'mongodb://localhost:27017/basic_node_app';
@@ -73,7 +74,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', userRouter)
-
+app.use(errorController.get404);
 app.use(errorHandler)
 
 mongoose.connect(dbUurl)
