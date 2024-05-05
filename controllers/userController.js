@@ -40,7 +40,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
 
         if(user) {
             req.flash('success', 'User successfuly created.');
-            res.redirect('/login')
+            return res.redirect('/login')
             // res.status(201).json({ message: "User successfuly created", data: user })
         }
 
@@ -52,10 +52,23 @@ const postSignup = asyncHandler(async(req, res, next) => {
 })
 
 const getLogin = (req, res, next) => {
-    let message = req.flash('error');
+    let message = '';
+    if (req.flash('error')) {
+        message = req.flash('error');
+    } else if (req.flash('success')) {
+        message = req.flash('success');
+    }
+
+    if (message.length > 0) {
+        message = message[0];
+    } else {
+        message = null;
+    }
     
     res.render('login', {
-        errorMessage: message
+        path: '/login',
+        pageTitle: 'Login',
+        message: message
     })
 }
 
@@ -65,23 +78,28 @@ const postLogin = asyncHandler(async(req, res, next) => {
     try {
         const userCheck = await User.findOne({ email: email })
         if (!userCheck) {
-            throw new Error("User not found")
+            req.flash("error", "User not found");
+            return res.redirect('/login');
         }
 
         const checkPassword = await bcrypt.compare(password, userCheck.password)
         if (!checkPassword) {
-            throw new Error("Credential not match")
+            req.flash("error", "Invalid credential");
+            return res.redirect('/login');
         }
 
+        req.flash("success", "User successfuly loggedin");
         req.session.isLoggedIn = true;
         req.session.user = userCheck;
-        req.session.save()
-        req.flash('User logged in successfuly!')
+        req.session.save((err) => {
+            return next(new Error(err))
+        })
+
         return res.redirect('/profile');
 
     } catch (err) {
         const error = new Error(err)
-        // error.statusCode = 400
+        error.statusCode = 500
         return next(error)
     }
 })
@@ -94,8 +112,9 @@ const getProfile = asyncHandler(async(req, res, next) => {
         message = null;
     }
     
-    res.render('profile', {
-        message: message
+    return res.render('profile', {
+        message: message,
+        user: req.session.user
     })
 })
 
@@ -120,9 +139,10 @@ const postProfile = asyncHandler(async(req, res, next) => {
 
 const postLogout = (req, res, next) => {
     req.session.destroy(err => {
-      console.log(err);
-      res.redirect('/login');
-    });
+      return next(new Error(err))
+    })
+
+    res.redirect('/login')
 };
 
 module.exports = { getSignup, postSignup, getLogin, postLogin, getProfile, postProfile, postLogout, getMainPage }

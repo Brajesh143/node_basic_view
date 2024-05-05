@@ -16,12 +16,12 @@
             <form class="main-form" action="/profile" method="post" enctype="multipart/form-data">
                 <div class="form-control">
                     <label for="name">Name</label>
-                    <input type="text" name="name" id="name" />
+                    <input type="text" name="name" id="name" value="<%= user.name %>" />
                 </div>
 
                 <div class="form-control">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" />
+                    <input type="email" name="email" id="email" value="<%= user.email %>" />
                 </div>
 
                 <div class="form-control">
@@ -31,7 +31,7 @@
 
                 <div class="form-control">
                     <label for="phone">Phone</label>
-                    <input type="text" name="phone" id="phone" />
+                    <input type="text" name="phone" id="phone" value="<%= user.phone %>" />
                 </div>
 
                 <div class="form-control">

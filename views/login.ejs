@@ -6,6 +6,11 @@
 
     <main>
         <div class="form-align">
+            <% if(message){ %>
+                <div class="alert alert-success" role="alert">
+                    <%= message %>
+                </div>
+            <% } %>
             <h1>Login</h1>
             <form class="main-form" action="/login" method="post">
                 <div class="form-control">
