@@ -6,11 +6,8 @@
 
     <main>
         <div class="form-align">
-            <% if(message){ %>
-                <div class="alert alert-success" role="alert">
-                    <%= message %>
-                </div>
-            <% } %>
+            <%- include('includes/alert.ejs') %>
+
             <h2 style="text-align: center;">Login</h2>
             <div class="login-form">
                 <form action="/login" method="post">

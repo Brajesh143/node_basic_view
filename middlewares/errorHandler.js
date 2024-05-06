@@ -1,5 +1,5 @@
 const errorHandler = (err, req, res, next) => {
-    return res.status(err.statusCode).send(err.message)
+    return res.send(err.message)
 }
-
+// status(err.statusCode).
 module.exports = errorHandler

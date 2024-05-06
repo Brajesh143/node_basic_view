@@ -7,11 +7,8 @@
 
     <main>
         <div class="form-align">
-            <% if(message){ %>
-            <div class="alert alert-success" role="alert">
-                <%= message %>
-            </div>
-            <% } %>
+            <%- include('includes/alert.ejs') %>
+            
             <h2 style="text-align: center;">User Profile</h2>
             <div class="login-form">
                 <form action="/profile" method="post" enctype="multipart/form-data">

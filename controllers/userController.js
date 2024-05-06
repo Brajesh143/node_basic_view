@@ -74,7 +74,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
         })
 
         if(user) {
-            req.flash('success', 'User successfuly created.');
+            req.flash('message', 'User successfuly created.');
             return res.redirect('/login')
         }
 
@@ -87,14 +87,8 @@ const postSignup = asyncHandler(async(req, res, next) => {
 
 const getLogin = (req, res, next) => {
     let message = '';
-    let error_type = '';
-
-    if (req.flash('error')) {
-        error_type = "error";
-        message = req.flash('error');
-    } else if (req.flash('success')) {
-        error_type = "success";
-        message = req.flash('success');
+    if (req.flash('message')) {
+        message = req.flash('message');
     }
 
     if (message.length > 0) {
@@ -106,8 +100,7 @@ const getLogin = (req, res, next) => {
     res.render('login', {
         path: '/login',
         pageTitle: 'Login',
-        errorMessage: message,
-        type: error_type
+        errorMessage: message
     })
 }
 
@@ -117,13 +110,13 @@ const postLogin = asyncHandler(async(req, res, next) => {
     try {
         const userCheck = await User.findOne({ email: email })
         if (!userCheck) {
-            req.flash("error", "User not found");
+            req.flash("success", "User not found");
             return res.redirect('/login');
         }
 
         const checkPassword = await bcrypt.compare(password, userCheck.password)
         if (!checkPassword) {
-            req.flash("error", "Invalid credential");
+            req.flash("success", "Invalid credential");
             return res.redirect('/login');
         }
 
@@ -144,16 +137,7 @@ const postLogin = asyncHandler(async(req, res, next) => {
 })
 
 const getProfile = asyncHandler(async(req, res, next) => {
-    let message = '';
-    let error_type = '';
-
-    if (req.flash('error')) {
-        error_type = "error";
-        message = req.flash('error');
-    } else if (req.flash('success')) {
-        error_type = "success";
-        message = req.flash('success');
-    }
+    let message = req.flash('success')
 
     if (message.length > 0) {
         message = message[0];
@@ -165,7 +149,6 @@ const getProfile = asyncHandler(async(req, res, next) => {
         pageTitle: 'Profile',
         path: '/profile',
         errorMessage: message,
-        type: error_type,
         user: req.session.user
     })
 })
@@ -181,7 +164,7 @@ const postProfile = asyncHandler(async(req, res, next) => {
         const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl,}})
 
         if (userUpdate) {
-            req.flash('success', 'Profile updated successfuly!')
+            req.flash('message', 'Profile updated successfuly!')
             return res.redirect('/profile')
         }
 
