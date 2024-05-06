@@ -12,36 +12,28 @@
                 <%= message %>
             </div>
             <% } %>
-            <h1>User Profile</h1>
-            <form class="main-form" action="/profile" method="post" enctype="multipart/form-data">
-                <div class="form-control">
+            <h2 style="text-align: center;">User Profile</h2>
+            <div class="login-form">
+                <form action="/profile" method="post" enctype="multipart/form-data">
                     <label for="name">Name</label>
-                    <input type="text" name="name" id="name" value="<%= user.name %>" />
-                </div>
+                    <input type="text" id="name" name="name" placeholder="Your Name.." value="<%= user.name %>">
 
-                <div class="form-control">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" value="<%= user.email %>" />
-                </div>
-
-                <div class="form-control">
+                    <input type="email" id="email" name="email" placeholder="Your Email.." value="<%= user.email %>">
+              
                     <label for="password">Password</label>
-                    <input type="password" name="password" id="password" />
-                </div>
-
-                <div class="form-control">
+                    <input type="password" id="password" name="password" placeholder="********">
+                
                     <label for="phone">Phone</label>
-                    <input type="text" name="phone" id="phone" value="<%= user.phone %>" />
-                </div>
+                    <input type="text" id="phone" name="phone" placeholder="Your Phone.." value="<%= user.phone %>">
 
-                <div class="form-control">
                     <label for="image">Profile Image</label>
                     <input type="file" name="image" id="image" />
-                </div>                
 
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="submit" value="Update" />
-            </form>
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
         </div>
     </main>
 

@@ -4,11 +4,43 @@ const bcrypt = require("bcryptjs")
 const User = require("../models/user")
 
 const getMainPage = (req, res, next) => {
-    res.render('main')
+    let message = '';
+    let error_type = '';
+
+    if (req.flash('error')) {
+        error_type = "error";
+        message = req.flash('error');
+    } else if (req.flash('success')) {
+        error_type = "success";
+        message = req.flash('success');
+    }
+
+    if (message.length > 0) {
+        message = message[0];
+    } else {
+        message = null;
+    }
+
+    res.render('main', {
+        pageTitle: 'Home',
+        path: '/',
+        errorMessage: message,
+        type: error_type
+    })
 }
 
 const getSignup = (req, res, next) => {
-    let message = req.flash('error');
+    let message = '';
+    let error_type = '';
+
+    if (req.flash('error')) {
+        error_type = "error";
+        message = req.flash('error');
+    } else if (req.flash('success')) {
+        error_type = "success";
+        message = req.flash('success');
+    }
+
     if (message.length > 0) {
         message = message[0];
     } else {
@@ -16,7 +48,10 @@ const getSignup = (req, res, next) => {
     }
 
     res.render('signup', {
-        errorMessage: message
+        pageTitle: 'Registeration',
+        path: '/signup',
+        errorMessage: message,
+        type: error_type
     })
 }
 
@@ -27,7 +62,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
         const checkUser = await User.findOne({ email: email })
 
         if (checkUser) {
-            throw new Error("Email already exist")
+            return next(new Error("Email already exist"))
         }
         
         const hashedPassword = await bcrypt.hash(password, 12)
@@ -41,21 +76,24 @@ const postSignup = asyncHandler(async(req, res, next) => {
         if(user) {
             req.flash('success', 'User successfuly created.');
             return res.redirect('/login')
-            // res.status(201).json({ message: "User successfuly created", data: user })
         }
 
     } catch (err) {
         const error = new Error(err)
-        // error.statusCode = 500
+        error.statusCode = 500
         return next(error)
     }
 })
 
 const getLogin = (req, res, next) => {
     let message = '';
+    let error_type = '';
+
     if (req.flash('error')) {
+        error_type = "error";
         message = req.flash('error');
     } else if (req.flash('success')) {
+        error_type = "success";
         message = req.flash('success');
     }
 
@@ -68,7 +106,8 @@ const getLogin = (req, res, next) => {
     res.render('login', {
         path: '/login',
         pageTitle: 'Login',
-        message: message
+        errorMessage: message,
+        type: error_type
     })
 }
 
@@ -105,7 +144,17 @@ const postLogin = asyncHandler(async(req, res, next) => {
 })
 
 const getProfile = asyncHandler(async(req, res, next) => {
-    let message = req.flash('success');
+    let message = '';
+    let error_type = '';
+
+    if (req.flash('error')) {
+        error_type = "error";
+        message = req.flash('error');
+    } else if (req.flash('success')) {
+        error_type = "success";
+        message = req.flash('success');
+    }
+
     if (message.length > 0) {
         message = message[0];
     } else {
@@ -113,7 +162,10 @@ const getProfile = asyncHandler(async(req, res, next) => {
     }
     
     return res.render('profile', {
-        message: message,
+        pageTitle: 'Profile',
+        path: '/profile',
+        errorMessage: message,
+        type: error_type,
         user: req.session.user
     })
 })
@@ -128,11 +180,14 @@ const postProfile = asyncHandler(async(req, res, next) => {
         
         const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl,}})
 
-        res.redirect('/profile')
+        if (userUpdate) {
+            req.flash('success', 'Profile updated successfuly!')
+            return res.redirect('/profile')
+        }
 
     } catch (err) {
         const error = new Error(err)
-        // error.statusCode = 400
+        error.statusCode = 500
         return next(error)
     }
 })

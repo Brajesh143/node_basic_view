@@ -11,20 +11,19 @@
                     <%= message %>
                 </div>
             <% } %>
-            <h1>Login</h1>
-            <form class="main-form" action="/login" method="post">
-                <div class="form-control">
+            <h2 style="text-align: center;">Login</h2>
+            <div class="login-form">
+                <form action="/login" method="post">
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" />
-                </div>
-
-                <div class="form-control">
+                    <input type="email" id="email" name="email" placeholder="Your Email..">
+              
                     <label for="password">Password</label>
-                    <input type="password" name="password" id="password" />
-                </div>
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <input type="submit" value="Submit" />
-            </form>
+                    <input type="password" id="password" name="password" placeholder="********">
+                
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="submit" value="Login">
+                </form>
+            </div>
         </div>
     </main>
 
