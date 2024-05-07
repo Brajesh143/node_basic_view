@@ -1,15 +1,19 @@
 <%- include('includes/head.ejs') -%>
 <link rel="stylesheet" href="/css/form.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" >
 
 <body>
     <%- include('includes/navigation.ejs') %>
 
     <main>
         <div class="form-align">
-            <%- include('includes/alert.ejs') %>
-
             <h2 style="text-align: center;">Login</h2>
             <div class="login-form">
+                <% if(errorMessage) { %>
+                    <div class="alert alert-success" role="alert">
+                        <%= errorMessage %>
+                    </div>
+                <% } %>
                 <form action="/login" method="post">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Your Email..">

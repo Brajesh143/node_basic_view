@@ -4,16 +4,7 @@ const bcrypt = require("bcryptjs")
 const User = require("../models/user")
 
 const getMainPage = (req, res, next) => {
-    let message = '';
-    let error_type = '';
-
-    if (req.flash('error')) {
-        error_type = "error";
-        message = req.flash('error');
-    } else if (req.flash('success')) {
-        error_type = "success";
-        message = req.flash('success');
-    }
+    let message = req.flash('success')
 
     if (message.length > 0) {
         message = message[0];
@@ -24,22 +15,12 @@ const getMainPage = (req, res, next) => {
     res.render('main', {
         pageTitle: 'Home',
         path: '/',
-        errorMessage: message,
-        type: error_type
+        errorMessage: message
     })
 }
 
 const getSignup = (req, res, next) => {
-    let message = '';
-    let error_type = '';
-
-    if (req.flash('error')) {
-        error_type = "error";
-        message = req.flash('error');
-    } else if (req.flash('success')) {
-        error_type = "success";
-        message = req.flash('success');
-    }
+    let message = req.flash('success')
 
     if (message.length > 0) {
         message = message[0];
@@ -50,8 +31,7 @@ const getSignup = (req, res, next) => {
     res.render('signup', {
         pageTitle: 'Registeration',
         path: '/signup',
-        errorMessage: message,
-        type: error_type
+        errorMessage: message
     })
 }
 
@@ -62,7 +42,8 @@ const postSignup = asyncHandler(async(req, res, next) => {
         const checkUser = await User.findOne({ email: email })
 
         if (checkUser) {
-            return next(new Error("Email already exist"))
+            req.flash('success', 'Email alredy exist!');
+            return res.redirect('/signup')
         }
         
         const hashedPassword = await bcrypt.hash(password, 12)
@@ -74,7 +55,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
         })
 
         if(user) {
-            req.flash('message', 'User successfuly created.');
+            req.flash('success', 'User successfuly created.');
             return res.redirect('/login')
         }
 
@@ -86,10 +67,7 @@ const postSignup = asyncHandler(async(req, res, next) => {
 })
 
 const getLogin = (req, res, next) => {
-    let message = '';
-    if (req.flash('message')) {
-        message = req.flash('message');
-    }
+    let message = req.flash('success')
 
     if (message.length > 0) {
         message = message[0];
@@ -126,7 +104,6 @@ const postLogin = asyncHandler(async(req, res, next) => {
         req.session.save((err) => {
             return next(new Error(err))
         })
-
         return res.redirect('/profile');
 
     } catch (err) {
