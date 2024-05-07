@@ -44,21 +44,18 @@ const postSignup = asyncHandler(async(req, res, next) => {
         if (checkUser) {
             req.flash('success', 'Email alredy exist!');
             return res.redirect('/signup')
-        }
-        
-        const hashedPassword = await bcrypt.hash(password, 12)
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            phone
-        })
+        } else {
+            const hashedPassword = await bcrypt.hash(password, 12)
+            const user = await User.create({
+                name,
+                email,
+                password: hashedPassword,
+                phone
+            })
 
-        if(user) {
-            req.flash('success', 'User successfuly created.');
+            req.flash('success', 'User successfuly created!');
             return res.redirect('/login')
         }
-
     } catch (err) {
         const error = new Error(err)
         error.statusCode = 500
@@ -90,21 +87,21 @@ const postLogin = asyncHandler(async(req, res, next) => {
         if (!userCheck) {
             req.flash("success", "User not found");
             return res.redirect('/login');
+        } else {
+            const checkPassword = await bcrypt.compare(password, userCheck.password)
+            if (!checkPassword) {
+                req.flash("success", "Invalid credential");
+                return res.redirect('/login');
+            } else {
+                req.flash("success", "User successfuly loggedin");
+                req.session.isLoggedIn = true;
+                req.session.user = userCheck;
+                req.session.save((err) => {
+                    return next(err)
+                })
+                return res.redirect('/profile');
+            }
         }
-
-        const checkPassword = await bcrypt.compare(password, userCheck.password)
-        if (!checkPassword) {
-            req.flash("success", "Invalid credential");
-            return res.redirect('/login');
-        }
-
-        req.flash("success", "User successfuly loggedin");
-        req.session.isLoggedIn = true;
-        req.session.user = userCheck;
-        req.session.save((err) => {
-            return next(new Error(err))
-        })
-        return res.redirect('/profile');
 
     } catch (err) {
         const error = new Error(err)
@@ -136,27 +133,21 @@ const postProfile = asyncHandler(async(req, res, next) => {
     const userData = req.session.user
 
     try {
-
-        // if (req.file) {
-        //     const imageUrl = image.path;
-        //     const userImageUpdate = await User.updateOne({_id: userData._id}, {$set:{image: imageUrl}})
-        // }
-        const imageUrl = image.path;
-        const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl}})
+        if (req.file) {
+            const imageUrl = image.path;
+            const userUpdateImage = await User.updateOne({_id: userData._id}, {$set:{image: imageUrl}})
+        }
+        
+        const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone}})
 
         req.session.user = await User.findById(userData._id);
         req.session.save((err) => {
-            if (err) {
-                // Handle session save error
-                const error = new Error(err);
-                error.statusCode = 500;
-                return next(error);
-            }
+            return next(err)
+        })
             // Redirect after session is saved
-            req.flash('success', 'Profile updated successfully!');
-            return res.redirect('/profile');
-        });
-
+        req.flash('success', 'Profile updated successfully!');
+        return res.redirect('/profile');
+        
     } catch (err) {
         const error = new Error(err)
         error.statusCode = 500
