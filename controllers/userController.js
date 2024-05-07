@@ -136,14 +136,26 @@ const postProfile = asyncHandler(async(req, res, next) => {
     const userData = req.session.user
 
     try {
-        const imageUrl = image.path;
-        
-        const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl,}})
 
-        if (userUpdate) {
-            req.flash('message', 'Profile updated successfuly!')
-            return res.redirect('/profile')
-        }
+        // if (req.file) {
+        //     const imageUrl = image.path;
+        //     const userImageUpdate = await User.updateOne({_id: userData._id}, {$set:{image: imageUrl}})
+        // }
+        const imageUrl = image.path;
+        const userUpdate = await User.updateOne({_id: userData._id}, {$set:{name:name, email: email, phone: phone, image: imageUrl}})
+
+        req.session.user = await User.findById(userData._id);
+        req.session.save((err) => {
+            if (err) {
+                // Handle session save error
+                const error = new Error(err);
+                error.statusCode = 500;
+                return next(error);
+            }
+            // Redirect after session is saved
+            req.flash('success', 'Profile updated successfully!');
+            return res.redirect('/profile');
+        });
 
     } catch (err) {
         const error = new Error(err)
@@ -154,10 +166,13 @@ const postProfile = asyncHandler(async(req, res, next) => {
 
 const postLogout = (req, res, next) => {
     req.session.destroy(err => {
-      return next(new Error(err))
-    })
-
-    res.redirect('/login')
+        if (err) {
+            // If there's an error destroying the session, pass it to the error handler middleware
+            return next(new Error(err));
+        }
+        // Redirect to login page after successfully destroying the session
+        res.redirect('/login');
+    });
 };
 
 module.exports = { getSignup, postSignup, getLogin, postLogin, getProfile, postProfile, postLogout, getMainPage }

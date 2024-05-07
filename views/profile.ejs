@@ -29,7 +29,9 @@
 
                     <label for="image">Profile Image</label>
                     <input type="file" name="image" id="image" />
-
+                    <% if(user.image) { %>
+                        <img src="<%= user.image %>" height="100" width="100" />
+                    <% } %>
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     <input type="submit" value="Submit">
                 </form>

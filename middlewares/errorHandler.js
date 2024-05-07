@@ -1,5 +1,6 @@
-const errorHandler = (err, req, res, next) => {
-    return res.send(err.message)
+module.exports = (err, req, res, next) => {
+    if (err) {
+        return res.send(err.message);
+    }
+    next();
 }
-// status(err.statusCode).
-module.exports = errorHandler

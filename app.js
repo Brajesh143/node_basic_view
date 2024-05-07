@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(upload.single('image'));
 
 app.use(express.static(path.join(__dirname, 'public')))
-// app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(
     session({
@@ -54,6 +54,7 @@ app.use((req, res, next) => {
 
 app.use('/', userRouter) 
 app.use(errorController.get404);
+
 app.use(errorHandler)
 
 mongoose.connect(dbUurl)
